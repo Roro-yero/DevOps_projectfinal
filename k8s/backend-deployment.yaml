@@ -29,6 +29,24 @@ spec:
           image: roroyero/backend:latest
           env:
             - name: DATABASE_URL
-              value: "postgres://user:password@postgres:5432/mydatabase"
+              value: "postgres-deployement://roroyero:password@postgres-service:5432/database_name"
+            - name: POSTGRES_USER
+              value: "roroyero"
+            - name: POSTGRES_PASSWORD
+              value: "password"
+            - name: POSTGRES_DB
+              value: "database_name"
           ports:
             - containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10

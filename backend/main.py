@@ -6,10 +6,10 @@ from sqlalchemy.orm import sessionmaker, Session
 import pandas as pd
 import os
 
-# ✅ Initialisation de l'application FastAPI
+# Initialisation de l'application FastAPI
 app = FastAPI()
 
-# ✅ Configuration CORS
+#  Configuration CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
@@ -18,14 +18,14 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
-# ✅ Configuration de la base de données PostgreSQL
+#  Configuration de la base de données PostgreSQL
 DATABASE_URL = "postgresql://user:password@db:5432/mydatabase"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# ✅ Modèle SQLAlchemy mis à jour
+#  Modèle SQLAlchemy mis à jour
 class TestData(Base):
     __tablename__ = "test_data"
 
@@ -35,10 +35,10 @@ class TestData(Base):
     birth = Column(Date)
     school = Column(String)
 
-# ✅ Création de la table si elle n'existe pas
+# Création de la table si elle n'existe pas
 Base.metadata.create_all(bind=engine)
 
-# ✅ Dépendance pour la session DB
+#  Dépendance pour la session DB
 def get_db():
     db = SessionLocal()
     try:
@@ -46,7 +46,7 @@ def get_db():
     finally:
         db.close()
 
-# ✅ Endpoint de recherche amélioré (recherche par nom, prénom et école)
+#  Endpoint de recherche amélioré (recherche par nom, prénom et école)
 @app.get("/search/")
 def search_data(query: str, db: Session = Depends(get_db)):
     results = db.query(TestData).filter(
@@ -59,7 +59,7 @@ def search_data(query: str, db: Session = Depends(get_db)):
 
     return results
 
-# ✅ Fonction pour charger les données depuis le CSV
+#  Fonction pour charger les données depuis le CSV
 def load_data():
     try:
         # Vérifier si le fichier data.csv est présent
@@ -77,5 +77,5 @@ def load_data():
     except Exception as e:
         print(f"❌ Erreur lors du chargement des données : {e}")
 
-# ✅ Décommenter pour charger les données au démarrage
+# Décommenter pour charger les données au démarrage
 load_data()  # Charger les données lorsque l'application démarre
