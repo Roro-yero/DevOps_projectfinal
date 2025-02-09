@@ -1,0 +1,40 @@
+name: Continuous Delivery
+
+on:
+  push:
+    branches:
+      - main         # Déclenchement pour des merges dans la branche principale
+    tags:
+      - 'v*'         # Déclenchement pour des tags qui commencent par "v" (par exemple v1.0.0)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout du code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Configuration de Kubernetes
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          kubectl-version: 'v1.21.2'
+
+    #   # Authentification avec le cluster Kubernetes
+    #   - name: Set up kubeconfig
+    #     run: |
+    #       echo "{{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+
+      # Déploiement sur Kubernetes (apply les manifestes)
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f ./k8s/frontend-deployment.yaml
+          kubectl apply -f ./k8s/backend-deployment.yaml
+          kubectl apply -f ./k8s/postgres-deployment.yaml
+          
+
+      # Vérification du déploiement
+      - name: Check pods status
+        run: |
+          kubectl get pods -n default
