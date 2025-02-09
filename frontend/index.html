@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+        #results {
+            margin-top: 20px;
+            text-align: left;
+            display: inline-block;
+        }
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        async function search() {
+            let query = document.getElementById("search-input").value.trim();
+            
+            if (!query) {
+                alert("Veuillez entrer une recherche !");
+                return;
+            }
+
+            try {
+                let response = await fetch(`http://localhost:8000/search/?query=${query}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur serveur : ${response.status}`);
+                }
+
+                let results = await response.json();
+                let resultsContainer = document.getElementById("results");
+                resultsContainer.innerHTML = "";
+
+                if (!Array.isArray(results) || results.length === 0) {
+                    resultsContainer.innerHTML = "<p>Aucun résultat trouvé.</p>";
+                    return;
+                }
+
+                results.forEach(item => {
+                    let div = document.createElement("div");
+                    div.classList.add("result-item");
+                    div.innerHTML = `<strong>${item.name} ${item.fam_name}</strong><br>
+                                     📅 Naissance : ${item.birth}<br>
+                                     🎓 École : ${item.school}`;
+                    resultsContainer.appendChild(div);
+                });
+
+            } catch (error) {
+                console.error("❌ Erreur API :", error);
+                alert("Erreur lors de la récupération des résultats. Vérifiez la console.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Recherche de Données</h1>
+    <input type="text" id="search-input" placeholder="Rechercher par nom ou école...">
+    <button onclick="search()">Rechercher</button>
+    <div id="results"></div>
+</body>
+</html>

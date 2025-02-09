@@ -1,0 +1,11 @@
+Flask==2.2.2
+Werkzeug==2.2.2
+fastapi>=0.68.0
+uvicorn>=0.15.0
+sqlalchemy>=1.4.0
+python-multipart>=0.0.5
+flask-cors==3.0.10
+pandas
+psycopg2-binary
+pydantic
+flask
