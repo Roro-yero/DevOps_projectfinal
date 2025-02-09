@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # Démarre un conteneur PostgreSQL comme service
       postgres:
         image: postgres:latest
         env:
@@ -38,11 +37,11 @@ jobs:
     # Attendre que PostgreSQL soit prêt
     - name: Wait for PostgreSQL to be ready
       run: |
-        docker exec postgres pg_isready -U user  # Vérifier que PostgreSQL est prêt
+        docker exec ${{ job.services.postgres.id }} pg_isready -U user  # Vérifie que PostgreSQL est prêt
 
     - name: Load data into PostgreSQL
       run: |
-        docker exec -i postgres psql -U user -d mydatabase -c "COPY test_data(name, fam_name, birth, school) FROM '/docker-entrypoint-initdb.d/data.csv' WITH (FORMAT csv, HEADER true);"
+        docker exec -i ${{ job.services.postgres.id }} psql -U user -d mydatabase -c "COPY test_data(name, fam_name, birth, school) FROM '/docker-entrypoint-initdb.d/data.csv' WITH (FORMAT csv, HEADER true);"
 
     - name: Test API with curl
       run: |
