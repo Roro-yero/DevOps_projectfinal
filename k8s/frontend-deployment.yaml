@@ -1,9 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
@@ -13,21 +25,7 @@ spec:
         app: frontend
     spec:
       containers:
-      - name: frontend
-        image: roroyero/monfrontend:latest
-        ports:
-        - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend
-spec:
-  selector:
-    app: frontend
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-    nodePort: 30007  
-  type: NodePort
+        - name: frontend
+          image: roroyero/frontend:latest
+          ports:
+            - containerPort: 3000
