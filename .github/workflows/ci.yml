@@ -39,9 +39,10 @@ jobs:
       run: |
         docker exec ${{ job.services.postgres.id }} pg_isready -U user  # Vérifie que PostgreSQL est prêt
 
-    - name: Load data into PostgreSQL
+    # Créer la table et importer les données depuis le CSV
+    - name: Create table and import data
       run: |
-        docker exec -i ${{ job.services.postgres.id }} psql -U user -d mydatabase -c "COPY test_data(name, fam_name, birth, school) FROM '/docker-entrypoint-initdb.d/data.csv' WITH (FORMAT csv, HEADER true);"
+        docker exec -i ${{ job.services.postgres.id }} psql -U user -d mydatabase -f /docker-entrypoint-initdb.d/init-db.sql
 
     - name: Test API with curl
       run: |
@@ -51,3 +52,4 @@ jobs:
     - name: Clean up Docker containers
       run: |
         docker-compose down -v
+
