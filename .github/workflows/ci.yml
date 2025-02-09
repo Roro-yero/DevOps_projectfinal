@@ -1,0 +1,54 @@
+name: CI Pipeline
+
+# Déclencheur pour le pipeline : sur chaque push ou pull request sur la branche main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    services:
+      # Démarre un conteneur PostgreSQL comme service
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: user
+          POSTGRES_DB: mydatabase
+        options: --health-cmd="pg_isready -U user" --health-interval=5s --health-timeout=5s --health-retries=5
+
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image for backend
+      run: |
+        docker build -t backend_app ./backend  # Construire l'image Docker du backend
+
+    - name: Build Docker image for frontend
+      run: |
+        docker build -t frontend_app ./frontend  # Construire l'image Docker du frontend
+
+    # Attendre que PostgreSQL soit prêt
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        docker exec postgres pg_isready -U user  # Vérifier que PostgreSQL est prêt
+
+    - name: Load data into PostgreSQL
+      run: |
+        docker exec -i postgres psql -U user -d mydatabase -c "COPY test_data(name, fam_name, birth, school) FROM '/docker-entrypoint-initdb.d/data.csv' WITH (FORMAT csv, HEADER true);"
+
+    - name: Test API with curl
+      run: |
+        curl --fail http://localhost:8000/search/?query=romain  # Teste la recherche avec curl
+        curl --fail http://localhost:8000/search/?query=yerolymos
+
+    - name: Clean up Docker containers
+      run: |
+        docker-compose down -v
