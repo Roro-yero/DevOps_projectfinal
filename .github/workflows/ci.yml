@@ -1,55 +1,59 @@
 name: CI Pipeline
 
-# Déclencheur pour le pipeline : sur chaque push ou pull request sur la branche main
 on:
   push:
     branches:
       - main
   pull_request:
-    branches:
-      - main
 
 jobs:
-  build_and_test:
+  build:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_PASSWORD: password
-          POSTGRES_USER: user
-          POSTGRES_DB: mydatabase
-        options: --health-cmd="pg_isready -U user" --health-interval=5s --health-timeout=5s --health-retries=5
-
     steps:
-    - name: Checkout du code
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Build Docker image for backend
-      run: |
-        docker build -t backend_app ./backend  # Construire l'image Docker du backend
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: Build Docker image for frontend
-      run: |
-        docker build -t frontend_app ./frontend  # Construire l'image Docker du frontend
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
 
-    # Attendre que PostgreSQL soit prêt
-    - name: Wait for PostgreSQL to be ready
-      run: |
-        docker exec ${{ job.services.postgres.id }} pg_isready -U user  # Vérifie que PostgreSQL est prêt
+      - name: Run backend tests
+        run: |
+          cd backend
+          python -m unittest discover -s . -p "test_app.py"
 
-    # Créer la table et importer les données depuis le CSV
-    - name: Create table and import data
-      run: |
-        docker exec -i ${{ job.services.postgres.id }} psql -U user -d mydatabase -f /docker-entrypoint-initdb.d/init-db.sql
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Test API with curl
-      run: |
-        curl --fail http://localhost:8000/search/?query=romain  # Teste la recherche avec curl
-        curl --fail http://localhost:8000/search/?query=yerolymos
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
 
-    - name: Clean up Docker containers
-      run: |
-        docker-compose down -v
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm test
 
+      - name: Build Docker images
+        run: |
+          docker-compose build
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Docker images
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/monbackend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/monfrontend:latest
