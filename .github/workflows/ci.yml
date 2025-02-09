@@ -24,12 +24,12 @@ jobs:
       - name: 🏗️ Construire les images Docker
         run: docker-compose build
 
-      - name: 🚀 Démarrer les services (PostgreSQL, Backend)
-        run: docker-compose up -d postgres backend
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
 
-      - name: ⏳ Attendre que PostgreSQL démarre
-        run: sleep 10
-
+      
       # - name: ✅ Tester le backend
       #   run: docker-compose run --rm backend pytest test_app.py
 
