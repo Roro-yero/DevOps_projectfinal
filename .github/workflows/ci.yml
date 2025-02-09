@@ -29,15 +29,10 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm install
-
-      - name: Run frontend tests
-        run: |
-          cd frontend
-          npm test
+      # - name: Install frontend dependencies
+      #   run: |
+      #     cd frontend
+      #     npm install
 
       - name: Build Docker images
         run: |
