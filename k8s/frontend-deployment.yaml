@@ -1,15 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend
-spec:
-  selector:
-    app: frontend
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3000
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,6 +14,19 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: roroyero/frontend:latest
+          image: roroyero/frontend:latest  
           ports:
-            - containerPort: 3000
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer  # Change en NodePort si nécessaire
