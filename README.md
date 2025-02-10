@@ -9,7 +9,7 @@ Pour exécuter cette première phase, suivez les étapes suivantes :
 1. **Cloner le projet** sur votre machine :
 
    ```bash
-   git clone <URL_DU_REPO>
+   git clonehttps://github.com/Roro-yero/DevOps_projectfinal
    cd <NOM_DU_REPO>
    ```
 
@@ -36,9 +36,8 @@ Nous avons mis en place un pipeline CI/CD qui nous permet de pousser automatique
 
    - Assurez-vous d'avoir un compte Docker Hub.
    - Connectez-vous à Docker Hub depuis votre terminal :
-     ```bash
-     docker login
-     ```
+
+![image](https://github.com/user-attachments/assets/a86fcf19-32cd-459f-b360-25a89c9b3604)
 
 2. **Déploiement automatique avec le pipeline** :
 
@@ -47,27 +46,19 @@ Nous avons mis en place un pipeline CI/CD qui nous permet de pousser automatique
 
 ---
 
-**Note :** Assurez-vous que votre fichier de configuration CI/CD est correctement paramétré pour automatiser ce processus.
-
 # Phase 3 : Mise en place du Continuous Deployment (CD)
 
 Nous avons mis en place un processus de **Continuous Deployment (CD)** afin d'automatiser le déploiement de notre application après chaque mise à jour. Cependant, nous avons rencontré un problème critique :
 
 ## Problème rencontré
 
-- Une erreur de type **CrashLoopBackOff** est survenue sur le backend.
+- Une erreur de type **CrashLoopBackOff** est survenue sur le backend. Que nous avons résolu.
+- Mais nous avons tenté de déployer plusieurs fois notre application sans succès. En effet, une erreur que nous n'avons pas réussi à résoudre nous a stoppés.
 - Malgré plusieurs tentatives, nous n'avons pas encore réussi à résoudre ce problème.
 
-## Prochaines étapes
+  ![image](https://github.com/user-attachments/assets/8af3cfac-d9f0-4d91-b637-5a23d1d18f95)
 
-- Analyser les logs du backend pour identifier la cause du problème :
-  ```bash
-  kubectl logs <nom_du_pod_backend>
-  ```
-- Vérifier la configuration des ressources allouées (CPU/Mémoire).
-- S'assurer que la connexion à la base de données fonctionne correctement.
 
----
 
 Nous continuerons à travailler sur ce problème afin d'assurer un déploiement stable de notre application.
 
